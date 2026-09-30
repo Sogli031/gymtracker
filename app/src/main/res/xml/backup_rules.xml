@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Android Auto Backup pravila (Android < 12, atribut android:fullBackupContent).
+    Auto Backup je isključen (android:allowBackup="false"), a ovde je za svaki slučaj
+    isključeno SVE: izvor istine je app-ov Google Drive backup. Auto Backup bi posle
+    reinstalacije vratio staru bazu, stare JSON fajlove (koje bi JsonToRoomMigrator
+    ponovo uvezao) ili first_launch_done/cloud_adopted, i time nekonzistentno stanje.
+-->
+<full-backup-content>
+    <exclude domain="root" path="." />
+    <exclude domain="file" path="." />
+    <exclude domain="database" path="." />
+    <exclude domain="sharedpref" path="." />
+    <exclude domain="external" path="." />
+</full-backup-content>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Pravila za ekstrakciju podataka (Android 12+, atribut android:dataExtractionRules).
+    Isto kao backup_rules.xml: iz cloud backup-a i device-to-device transfera isključeno
+    je SVE. Izvor istine je app-ov Google Drive backup, pa Auto Backup ne sme da vraća
+    zastarelo/nekonzistentno stanje.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" path="." />
+        <exclude domain="file" path="." />
+        <exclude domain="database" path="." />
+        <exclude domain="sharedpref" path="." />
+        <exclude domain="external" path="." />
+    </device-transfer>
+</data-extraction-rules>
