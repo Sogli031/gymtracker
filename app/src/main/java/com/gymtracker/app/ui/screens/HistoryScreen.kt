@@ -1,6 +1,7 @@
 package com.gymtracker.app.ui.screens
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -23,7 +25,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.Surface
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -43,6 +47,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gymtracker.app.data.model.Workout
+import com.gymtracker.app.data.model.WorkoutTemplate
 import com.gymtracker.app.data.repository.WorkoutRepository
 import com.gymtracker.app.ui.components.WorkoutCard
 import com.gymtracker.app.ui.theme.UiTokens
@@ -57,6 +62,7 @@ fun LogContent(
     val workouts by repository.workouts.collectAsState()
     val isLoaded by repository.isLoaded.collectAsState()
     var workoutToDelete by remember { mutableStateOf<Workout?>(null) }
+    var showTemplatePicker by remember { mutableStateOf(false) }
 
     Box(modifier = modifier.fillMaxSize()) {
         Column(
@@ -70,7 +76,7 @@ fun LogContent(
                     )
                 },
                 actions = {
-                    IconButton(onClick = { navController.navigate("add_workout") }) {
+                    IconButton(onClick = { showTemplatePicker = true }) {
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = "Dodaj trening",
@@ -147,6 +153,36 @@ fun LogContent(
         }
     }
 
+    // „+“: izbor vrste treninga (Volume = dosadašnji šablon, HIT = sve po 1 seriju)
+    if (showTemplatePicker) {
+        AlertDialog(
+            onDismissRequest = { showTemplatePicker = false },
+            title = { Text("Novi trening") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    WorkoutTemplate.entries.forEach { template ->
+                        TemplateOption(
+                            template = template,
+                            onClick = {
+                                showTemplatePicker = false
+                                navController.navigate("add_workout?template=${template.name}")
+                            }
+                        )
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = {
+                TextButton(onClick = { showTemplatePicker = false }) {
+                    Text("Odustani")
+                }
+            },
+            containerColor = UiTokens.Surface,
+            titleContentColor = UiTokens.TextPrimary,
+            textContentColor = UiTokens.TextSecondary
+        )
+    }
+
     // Delete confirmation dialog
     workoutToDelete?.let { workout ->
         AlertDialog(
@@ -176,6 +212,32 @@ fun LogContent(
             titleContentColor = UiTokens.TextPrimary,
             textContentColor = UiTokens.TextSecondary
         )
+    }
+}
+
+@Composable
+private fun TemplateOption(template: WorkoutTemplate, onClick: () -> Unit) {
+    Surface(
+        onClick = onClick,
+        shape = MaterialTheme.shapes.medium,
+        color = UiTokens.SurfaceElevated,
+        border = BorderStroke(1.dp, UiTokens.GlassBorder),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(min = 56.dp)
+    ) {
+        Column(modifier = Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Text(
+                text = template.label,
+                style = MaterialTheme.typography.titleMedium,
+                color = UiTokens.TextPrimary
+            )
+            Text(
+                text = template.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = UiTokens.TextMuted
+            )
+        }
     }
 }
 

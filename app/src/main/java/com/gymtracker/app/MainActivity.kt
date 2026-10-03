@@ -46,6 +46,7 @@ import com.gymtracker.app.ui.screens.AddWorkoutScreen
 import com.gymtracker.app.ui.screens.MainScreen
 import com.gymtracker.app.ui.theme.GymTrackerTheme
 import com.gymtracker.app.ui.theme.UiTokens
+import com.gymtracker.app.data.model.WorkoutTemplate
 import java.io.File
 
 class MainActivity : ComponentActivity() {
@@ -170,15 +171,24 @@ private fun AppNavigation(
             )
         }
 
+        // Novi trening; template = VOLUME (podrazumevano) ili HIT, bira se na „+“
         composable(
-            route = "add_workout"
-        ) {
+            route = "add_workout?template={template}",
+            arguments = listOf(
+                navArgument("template") {
+                    type = NavType.StringType
+                    nullable = true
+                    defaultValue = null
+                }
+            )
+        ) { backStackEntry ->
             AddWorkoutScreen(
                 navController = navController,
                 repository = workoutRepository,
                 customExerciseRepository = customExerciseRepository,
                 machineSettingsRepository = machineSettingsRepository,
-                workoutId = null
+                workoutId = null,
+                template = WorkoutTemplate.fromRoute(backStackEntry.arguments?.getString("template"))
             )
         }
 

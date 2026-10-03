@@ -1,4 +1,4 @@
-﻿package com.gymtracker.app.ui.screens
+package com.gymtracker.app.ui.screens
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
@@ -52,9 +52,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.gymtracker.app.data.model.Config
-import com.gymtracker.app.data.model.ExerciseCategory
 import com.gymtracker.app.data.model.Workout
 import com.gymtracker.app.data.model.WorkoutExercise
+import com.gymtracker.app.data.model.WorkoutTemplate
+import com.gymtracker.app.data.model.templateExercises
 import com.gymtracker.app.data.repository.CustomExerciseRepository
 import com.gymtracker.app.data.repository.MachineSettingsRepository
 import com.gymtracker.app.data.repository.WorkoutRepository
@@ -84,7 +85,8 @@ fun AddWorkoutScreen(
     customExerciseRepository: CustomExerciseRepository? = null,
     machineSettingsRepository: MachineSettingsRepository? = null,
     workoutId: String? = null,
-    copyFromWorkoutId: String? = null
+    copyFromWorkoutId: String? = null,
+    template: WorkoutTemplate = WorkoutTemplate.VOLUME
 ) {
     val customExercises by (customExerciseRepository?.exercises
         ?: kotlinx.coroutines.flow.MutableStateFlow(emptyList())).collectAsState()
@@ -115,7 +117,7 @@ fun AddWorkoutScreen(
         mutableStateOf(
             existingWorkout?.name
                 ?: copyFromWorkout?.name
-                ?: ""
+                ?: if (template == WorkoutTemplate.HIT) WorkoutTemplate.HIT.label else ""
         )
     }
     var dateText by rememberSaveable {
@@ -133,50 +135,8 @@ fun AddWorkoutScreen(
     var savedDraftId by rememberSaveable { mutableStateOf<String?>(null) }
     var hasNavigatedAway by remember { mutableStateOf(false) }
 
-    // Podrazumevani šablon za novi trening (celo telo)
-    fun templateExercise(name: String, category: ExerciseCategory, sets: Int) =
-        WorkoutExercise(
-            exerciseName = name,
-            category = category,
-            sets = List(sets) { com.gymtracker.app.data.model.ExerciseSet() }
-        )
-
-    // Leđa se smenjuju: ako je poslednji odrađen trening imao Lat Pulldown, sada ide Cable Row, i obrnuto.
-    val backExercise = if (existingWorkout == null && copyFromWorkout == null) {
-        val lastBack = repository.workouts.value
-            .sortedWith(compareByDescending<Workout> { it.date }.thenByDescending { it.time })
-            .asSequence()
-            .flatMap { it.exercises.asSequence() }
-            .firstOrNull { ex ->
-                (ex.exerciseName.equals("Lat Pulldown", ignoreCase = true) ||
-                    ex.exerciseName.equals("Cable Row", ignoreCase = true)) &&
-                    ex.sets.any { it.isComplete }
-            }
-        if (lastBack?.exerciseName.equals("Lat Pulldown", ignoreCase = true)) "Cable Row" else "Lat Pulldown"
-    } else "Lat Pulldown"
-
-    // Grudi se smenjuju: ako je poslednji trening imao Chest Press Machine, sada ide Bench Press, i obrnuto.
-    val chestExercise = if (existingWorkout == null && copyFromWorkout == null) {
-        val lastChest = repository.workouts.value
-            .sortedWith(compareByDescending<Workout> { it.date }.thenByDescending { it.time })
-            .asSequence()
-            .flatMap { it.exercises.asSequence() }
-            .firstOrNull { ex ->
-                (ex.exerciseName.equals("Chest Press Machine", ignoreCase = true) ||
-                    ex.exerciseName.equals("Bench Press", ignoreCase = true)) &&
-                    ex.sets.any { it.isComplete }
-            }
-        if (lastChest?.exerciseName.equals("Chest Press Machine", ignoreCase = true)) "Bench Press" else "Chest Press Machine"
-    } else "Chest Press Machine"
-
-    val defaultTemplate = listOf(
-        templateExercise(chestExercise, ExerciseCategory.GRUDI, 3),
-        templateExercise(backExercise, ExerciseCategory.LEDJA, 3),
-        templateExercise("Leg Press", ExerciseCategory.NOGE, 3),
-        templateExercise("Cable Overhead Extension", ExerciseCategory.TRICEPS, 2),
-        templateExercise("Dumbbell Curl", ExerciseCategory.BICEPS, 2),
-        templateExercise("Lateral Raise", ExerciseCategory.RAMENA, 2)
-    )
+    // Šablon novog treninga (Volume ili HIT) — vidi WorkoutTemplate.kt
+    val defaultTemplate = remember(template) { templateExercises(template, repository.workouts.value) }
 
     // Initialize exercises from existing or copied workout, or use default template
     var exercises by remember {
