@@ -21,10 +21,10 @@ class WorkoutTemplateTest {
         Workout(date = LocalDate.of(2026, 10, day), time = LocalTime.of(18, 0), exercises = exercises.toList())
 
     @Test
-    fun `hit is six exercises with one set each in fixed order`() {
+    fun `hit is seven exercises with one set each in fixed order`() {
         val hit = templateExercises(WorkoutTemplate.HIT, emptyList())
         assertEquals(
-            listOf("Chest Press Machine", "Lat Pulldown", "Bench Press", "Cable Row", "Cable Overhead Extension", "Dumbbell Curl"),
+            listOf("Chest Press Machine", "Lat Pulldown", "Bench Press", "Cable Row", "Leg Press", "Cable Overhead Extension", "Dumbbell Curl"),
             hit.map { it.exerciseName }
         )
         assertTrue(hit.all { it.sets.size == 1 && !it.sets.single().isComplete })

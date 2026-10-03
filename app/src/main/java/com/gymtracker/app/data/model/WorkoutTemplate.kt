@@ -32,6 +32,7 @@ fun templateExercises(template: WorkoutTemplate, history: List<Workout>): List<W
             templateExercise(LAT_PULLDOWN, ExerciseCategory.LEDJA, 1),
             templateExercise(BENCH_PRESS, ExerciseCategory.GRUDI, 1),
             templateExercise(CABLE_ROW, ExerciseCategory.LEDJA, 1),
+            templateExercise("Leg Press", ExerciseCategory.NOGE, 1),
             templateExercise("Cable Overhead Extension", ExerciseCategory.TRICEPS, 1),
             templateExercise("Dumbbell Curl", ExerciseCategory.BICEPS, 1)
         )
