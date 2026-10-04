@@ -6,116 +6,76 @@ import androidx.compose.material3.Shapes
 import androidx.compose.material3.Typography
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 
+// Kompletna M3 tamna šema (seed #3EC8A8). Sve uloge su popunjene da nijedna
+// komponenta (meni, sheet, switch, chip) ne padne na podrazumevane ljubičaste boje.
+// Kontrast proveren: onPrimary/primary 6.3:1, onSurfaceVariant/surface 8.9:1,
+// outline/surfaceContainerHigh 4.2:1.
 private val AppColorScheme = darkColorScheme(
     primary = UiTokens.Accent,
+    onPrimary = Color(0xFF00382D),
+    primaryContainer = Color(0xFF005143),
+    onPrimaryContainer = Color(0xFF7DF8D6),
+    inversePrimary = Color(0xFF006B58),
+
     secondary = UiTokens.AccentAlt,
-    background = UiTokens.BgTop,
-    surface = UiTokens.Surface,
-    surfaceVariant = UiTokens.SurfaceElevated,
+    onSecondary = Color(0xFF002F65),
+    secondaryContainer = Color(0xFF26354A),
+    onSecondaryContainer = Color(0xFFD6E3FF),
+
+    tertiary = Color(0xFFFFB86B),
+    onTertiary = Color(0xFF4A2800),
+    tertiaryContainer = Color(0xFF6A3C00),
+    onTertiaryContainer = Color(0xFFFFDCBE),
+
     error = UiTokens.Danger,
-    onPrimary = UiTokens.TextPrimary,
-    onSecondary = UiTokens.TextPrimary,
+    onError = Color(0xFF4A0A0A),
+    errorContainer = Color(0xFF5C1A1A),
+    onErrorContainer = Color(0xFFFFDAD6),
+
+    background = UiTokens.BgTop,
     onBackground = UiTokens.TextPrimary,
+    surface = UiTokens.BgTop,
     onSurface = UiTokens.TextPrimary,
-    onSurfaceVariant = UiTokens.TextSecondary,
-    onError = UiTokens.TextPrimary,
-    outline = UiTokens.GlassBorder
+    surfaceVariant = UiTokens.SurfaceMuted,
+    onSurfaceVariant = Color(0xFFA9B3C3),
+    surfaceTint = UiTokens.Accent,
+    inverseSurface = UiTokens.TextPrimary,
+    inverseOnSurface = UiTokens.SurfaceElevated,
+
+    surfaceDim = UiTokens.BgBottom,
+    surfaceBright = Color(0xFF2E3542),
+    surfaceContainerLowest = UiTokens.BgBottom,
+    surfaceContainerLow = Color(0xFF11161D),
+    surfaceContainer = UiTokens.Surface,
+    surfaceContainerHigh = UiTokens.SurfaceElevated,
+    surfaceContainerHighest = UiTokens.SurfaceMuted,
+
+    outline = Color(0xFF77839A),
+    outlineVariant = UiTokens.GlassBorder,
+    scrim = Color.Black
 )
 
-private val AppTypography = Typography(
-    displayLarge = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        letterSpacing = 0.sp
-    ),
-    displayMedium = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        letterSpacing = 0.sp
-    ),
-    displaySmall = TextStyle(
-        fontWeight = FontWeight.Bold,
-        fontSize = 24.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineLarge = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 22.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineMedium = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 20.sp,
-        letterSpacing = 0.sp
-    ),
-    headlineSmall = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        letterSpacing = 0.sp
-    ),
-    titleLarge = TextStyle(
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        letterSpacing = 0.sp
-    ),
-    titleMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        letterSpacing = 0.15.sp
-    ),
-    titleSmall = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        letterSpacing = 0.1.sp
-    ),
-    bodyLarge = TextStyle(
-        fontWeight = FontWeight.Normal,
-        fontSize = 16.sp,
-        letterSpacing = 0.5.sp
-    ),
-    bodyMedium = TextStyle(
-        fontWeight = FontWeight.Normal,
-        fontSize = 14.sp,
-        letterSpacing = 0.25.sp
-    ),
-    bodySmall = TextStyle(
-        fontWeight = FontWeight.Normal,
-        fontSize = 12.sp,
-        letterSpacing = 0.4.sp
-    ),
-    labelLarge = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 14.sp,
-        letterSpacing = 0.1.sp
-    ),
-    labelMedium = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 12.sp,
-        letterSpacing = 0.5.sp
-    ),
-    labelSmall = TextStyle(
-        fontWeight = FontWeight.Medium,
-        fontSize = 10.sp,
-        letterSpacing = 0.5.sp
-    )
-)
+// M3 baseline type scale (Roboto): Display 57/45/36, Headline 32/28/24,
+// Title 22/16/14, Body 16/14/12, Label 14/12/11.
+private val AppTypography = Typography()
 
+// M3 shape scale; extraLarge = 28dp za dijaloge i bottom sheet-ove.
 private val AppShapes = Shapes(
     extraSmall = RoundedCornerShape(4.dp),
     small = RoundedCornerShape(8.dp),
     medium = RoundedCornerShape(12.dp),
     large = RoundedCornerShape(16.dp),
-    extraLarge = RoundedCornerShape(20.dp)
+    extraLarge = RoundedCornerShape(28.dp)
 )
 
-val AppGradient = Brush.verticalGradient(listOf(UiTokens.BgTop, UiTokens.BgBottom))
-val CardShape = RoundedCornerShape(16.dp)
+/** Kartice koriste M3 shape `medium` (12dp). */
+val CardShape = AppShapes.medium
+
+/** Max širina sadržaja na tabletu / landscape-u (M3: 840dp). */
+val MaxContentWidth = 840.dp
 
 @Composable
 fun GymTrackerTheme(content: @Composable () -> Unit) {

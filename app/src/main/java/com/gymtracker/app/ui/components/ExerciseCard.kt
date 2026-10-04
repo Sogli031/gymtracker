@@ -11,16 +11,18 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import kotlinx.coroutines.delay
@@ -78,7 +81,7 @@ fun ExerciseCard(
 
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Column(
@@ -97,53 +100,67 @@ fun ExerciseCard(
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     text = exercise.exerciseName,
-                    color = UiTokens.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f)
                 )
                 if (onEditMachineSettings != null) {
-                    IconButton(onClick = onEditMachineSettings, modifier = Modifier.size(36.dp)) {
+                    IconButton(onClick = onEditMachineSettings) {
                         Icon(
                             Icons.Default.Settings,
                             contentDescription = "Podešavanja mašine",
-                            tint = if (machineSettings.isNotEmpty()) UiTokens.Accent else UiTokens.TextMuted
+                            tint = if (machineSettings.isNotEmpty()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
-                if (onReplaceExercise != null) {
-                    IconButton(onClick = onReplaceExercise, modifier = Modifier.size(36.dp)) {
+                // Ostale akcije u overflow meniju: 48dp touch target bez gušenja naziva vežbe
+                Box {
+                    var menuOpen by remember { mutableStateOf(false) }
+                    IconButton(onClick = { menuOpen = true }) {
                         Icon(
-                            Icons.Default.Refresh,
-                            contentDescription = "Izmeni vežbu",
-                            tint = UiTokens.TextMuted
+                            Icons.Default.MoreVert,
+                            contentDescription = "Opcije vežbe",
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                }
-                if (onMoveUp != null) {
-                    IconButton(onClick = onMoveUp, modifier = Modifier.size(36.dp)) {
-                        Icon(
-                            Icons.Default.KeyboardArrowUp,
-                            contentDescription = "Pomeri gore",
-                            tint = UiTokens.TextMuted
+                    DropdownMenu(
+                        expanded = menuOpen,
+                        onDismissRequest = { menuOpen = false }
+                    ) {
+                        if (onReplaceExercise != null) {
+                            DropdownMenuItem(
+                                text = { Text("Izmeni vežbu") },
+                                leadingIcon = { Icon(Icons.Default.Refresh, contentDescription = null) },
+                                onClick = { menuOpen = false; onReplaceExercise() }
+                            )
+                        }
+                        if (onMoveUp != null) {
+                            DropdownMenuItem(
+                                text = { Text("Pomeri gore") },
+                                leadingIcon = { Icon(Icons.Default.KeyboardArrowUp, contentDescription = null) },
+                                onClick = { menuOpen = false; onMoveUp() }
+                            )
+                        }
+                        if (onMoveDown != null) {
+                            DropdownMenuItem(
+                                text = { Text("Pomeri dole") },
+                                leadingIcon = { Icon(Icons.Default.KeyboardArrowDown, contentDescription = null) },
+                                onClick = { menuOpen = false; onMoveDown() }
+                            )
+                        }
+                        DropdownMenuItem(
+                            text = { Text("Ukloni", color = MaterialTheme.colorScheme.error) },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.Delete,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.error
+                                )
+                            },
+                            onClick = { menuOpen = false; onRemoveExercise() }
                         )
                     }
-                }
-                if (onMoveDown != null) {
-                    IconButton(onClick = onMoveDown, modifier = Modifier.size(36.dp)) {
-                        Icon(
-                            Icons.Default.KeyboardArrowDown,
-                            contentDescription = "Pomeri dole",
-                            tint = UiTokens.TextMuted
-                        )
-                    }
-                }
-                IconButton(onClick = onRemoveExercise, modifier = Modifier.size(36.dp)) {
-                    Icon(
-                        Icons.Default.Delete,
-                        contentDescription = "Ukloni",
-                        tint = UiTokens.Danger
-                    )
                 }
             }
 
@@ -152,7 +169,7 @@ fun ExerciseCard(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(UiTokens.SurfaceElevated, RoundedCornerShape(6.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.shapes.small)
                         .padding(horizontal = 10.dp, vertical = 6.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
@@ -160,7 +177,7 @@ fun ExerciseCard(
                         Text(
                             text = "${setting.name}: ${setting.value}",
                             style = MaterialTheme.typography.labelSmall,
-                            color = UiTokens.TextMuted
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                 }
@@ -176,20 +193,20 @@ fun ExerciseCard(
             ) {
                 Text(
                     text = "#",
-                    color = UiTokens.TextMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.width(32.dp)
                 )
                 Text(
                     text = "KG",
-                    color = UiTokens.TextMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.weight(1f)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
                     text = "PONAVLJANJA",
-                    color = UiTokens.TextMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.labelSmall,
                     modifier = Modifier.weight(1f)
                 )
@@ -226,14 +243,14 @@ fun ExerciseCard(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(UiTokens.SurfaceElevated, RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceContainerHigh, MaterialTheme.shapes.small)
                         .padding(horizontal = 12.dp, vertical = 10.dp)
                 ) {
                     // Prikaz prethodnog 1RM
                     Text(
                         text = "Prethodni 1RM: ${String.format("%.1f", targetOneRM)}kg",
                         style = MaterialTheme.typography.bodySmall,
-                        color = UiTokens.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
                     if (currentReps != null && currentReps > 0) {
@@ -256,8 +273,8 @@ fun ExerciseCard(
                             fontWeight = FontWeight.Medium,
                             color = when {
                                 percent > 0.5 -> UiTokens.Success
-                                percent < -0.5 -> UiTokens.Danger
-                                else -> UiTokens.TextSecondary
+                                percent < -0.5 -> MaterialTheme.colorScheme.error
+                                else -> MaterialTheme.colorScheme.onSurfaceVariant
                             }
                         )
                     } else {
@@ -268,7 +285,7 @@ fun ExerciseCard(
                             Text(
                                 text = "Za isti 1RM uradi $repsForSame ponavljanja",
                                 style = MaterialTheme.typography.labelSmall,
-                                color = UiTokens.TextMuted
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -284,7 +301,7 @@ fun ExerciseCard(
                 Text(
                     text = "${String.format("%.1f", best1RM)}kg 1RM",
                     style = MaterialTheme.typography.labelSmall,
-                    color = UiTokens.TextMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.padding(horizontal = 4.dp)
                 )
             }
@@ -299,12 +316,12 @@ fun ExerciseCard(
                 Icon(
                     Icons.Default.Add,
                     contentDescription = null,
-                    tint = UiTokens.Accent
+                    tint = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Dodaj seriju",
-                    color = UiTokens.Accent
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
@@ -324,7 +341,7 @@ private fun RestTimerText(startMs: Long) {
     Text(
         text = "⏱ %02d:%02d".format(secs / 60, secs % 60),
         style = MaterialTheme.typography.labelMedium,
-        color = UiTokens.Accent,
+        color = MaterialTheme.colorScheme.primary,
         modifier = Modifier.padding(start = 36.dp, top = 4.dp)
     )
 }

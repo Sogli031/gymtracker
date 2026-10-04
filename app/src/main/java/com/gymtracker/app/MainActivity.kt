@@ -1,6 +1,7 @@
 package com.gymtracker.app
 
-import android.graphics.Color
+import androidx.compose.material3.MaterialTheme
+
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -22,8 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -45,7 +44,6 @@ import com.gymtracker.app.data.repository.WorkoutRepository
 import com.gymtracker.app.ui.screens.AddWorkoutScreen
 import com.gymtracker.app.ui.screens.MainScreen
 import com.gymtracker.app.ui.theme.GymTrackerTheme
-import com.gymtracker.app.ui.theme.UiTokens
 import com.gymtracker.app.data.model.WorkoutTemplate
 import java.io.File
 
@@ -54,9 +52,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         enableEdgeToEdge()
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = Color.TRANSPARENT
-        window.navigationBarColor = Color.TRANSPARENT
 
         // Proveri da li postoji crash log od prethodnog pokretanja
         val crashFile = File(filesDir, "crash_log.txt")
@@ -64,7 +59,7 @@ class MainActivity : ComponentActivity() {
             val crashLog = crashFile.readText()
             crashFile.delete()
             setContent {
-                CrashLogScreen(crashLog)
+                GymTrackerTheme { CrashLogScreen(crashLog) }
             }
             return
         }
@@ -83,7 +78,7 @@ class MainActivity : ComponentActivity() {
             val sw = java.io.StringWriter()
             e.printStackTrace(java.io.PrintWriter(sw))
             setContent {
-                CrashLogScreen("INIT CRASH:\n${sw}")
+                GymTrackerTheme { CrashLogScreen("INIT CRASH:\n${sw}") }
             }
             return
         }
@@ -111,14 +106,14 @@ private fun CrashLogScreen(crashLog: String) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(UiTokens.Surface)
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
             .verticalScroll(rememberScrollState())
     ) {
         Text(
             text = "Aplikacija je pukla",
-            color = UiTokens.Danger,
-            fontSize = 18.sp,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.titleLarge,
             modifier = Modifier.padding(bottom = 12.dp, top = 40.dp)
         )
         androidx.compose.material3.Button(
@@ -126,18 +121,14 @@ private fun CrashLogScreen(crashLog: String) {
                 clipboardManager.setText(androidx.compose.ui.text.AnnotatedString(crashLog))
                 copied = true
             },
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = UiTokens.Accent,
-                contentColor = UiTokens.TextPrimary
-            ),
             modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
         ) {
             Text(if (copied) "Kopirano!" else "Kopiraj crash log")
         }
         Text(
             text = crashLog,
-            color = UiTokens.TextPrimary,
-            fontSize = 10.sp,
+            color = MaterialTheme.colorScheme.onSurface,
+            style = MaterialTheme.typography.labelSmall,
             fontFamily = FontFamily.Monospace,
             modifier = Modifier.horizontalScroll(rememberScrollState())
         )

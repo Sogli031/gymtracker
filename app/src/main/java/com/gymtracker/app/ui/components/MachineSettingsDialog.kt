@@ -16,7 +16,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.gymtracker.app.data.model.MachineSetting
-import com.gymtracker.app.ui.theme.UiTokens
 
 @Composable
 fun MachineSettingsDialog(
@@ -46,15 +44,6 @@ fun MachineSettingsDialog(
         }
     }
 
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = UiTokens.Accent,
-        unfocusedBorderColor = UiTokens.GlassBorder,
-        focusedTextColor = UiTokens.TextPrimary,
-        unfocusedTextColor = UiTokens.TextPrimary,
-        cursorColor = UiTokens.Accent,
-        focusedContainerColor = UiTokens.SurfaceElevated,
-        unfocusedContainerColor = UiTokens.SurfaceElevated
-    )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -66,7 +55,7 @@ fun MachineSettingsDialog(
                 Text(
                     text = exerciseName,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = UiTokens.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -82,30 +71,27 @@ fun MachineSettingsDialog(
                             onValueChange = { newName ->
                                 editableSettings[index] = newName to editableSettings[index].second
                             },
-                            placeholder = { Text("Naziv", color = UiTokens.TextMuted.copy(alpha = 0.5f)) },
+                            placeholder = { Text("Naziv", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             modifier = Modifier.weight(1f),
-                            singleLine = true,
-                            colors = textFieldColors
+                            singleLine = true
                         )
                         OutlinedTextField(
                             value = value,
                             onValueChange = { newValue ->
                                 editableSettings[index] = editableSettings[index].first to newValue
                             },
-                            placeholder = { Text("Vrednost", color = UiTokens.TextMuted.copy(alpha = 0.5f)) },
+                            placeholder = { Text("Vrednost", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                             modifier = Modifier.weight(0.6f),
-                            singleLine = true,
-                            colors = textFieldColors
+                            singleLine = true
                         )
                         if (editableSettings.size > 1) {
                             IconButton(
-                                onClick = { editableSettings.removeAt(index) },
-                                modifier = Modifier.size(36.dp)
+                                onClick = { editableSettings.removeAt(index) }
                             ) {
                                 Icon(
                                     Icons.Default.Close,
                                     contentDescription = "Obriši",
-                                    tint = UiTokens.TextMuted,
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                                     modifier = Modifier.size(18.dp)
                                 )
                             }
@@ -121,12 +107,12 @@ fun MachineSettingsDialog(
                     Icon(
                         Icons.Default.Add,
                         contentDescription = null,
-                        tint = UiTokens.Accent
+                        tint = MaterialTheme.colorScheme.primary
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = "Dodaj podešavanje",
-                        color = UiTokens.Accent
+                        color = MaterialTheme.colorScheme.primary
                     )
                 }
             }
@@ -141,16 +127,13 @@ fun MachineSettingsDialog(
                     onSave(result)
                 }
             ) {
-                Text("Sačuvaj", color = UiTokens.Accent)
+                Text("Sačuvaj", color = MaterialTheme.colorScheme.primary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text("Odustani")
             }
-        },
-        containerColor = UiTokens.Surface,
-        titleContentColor = UiTokens.TextPrimary,
-        textContentColor = UiTokens.TextSecondary
+        }
     )
 }

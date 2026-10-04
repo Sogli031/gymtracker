@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.FitnessCenter
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -32,7 +33,6 @@ import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -50,7 +50,6 @@ import com.gymtracker.app.data.model.Workout
 import com.gymtracker.app.data.model.WorkoutTemplate
 import com.gymtracker.app.data.repository.WorkoutRepository
 import com.gymtracker.app.ui.components.WorkoutCard
-import com.gymtracker.app.ui.theme.UiTokens
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -72,21 +71,9 @@ fun LogContent(
                 title = {
                     Text(
                         text = "Log",
-                        color = UiTokens.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
-                },
-                actions = {
-                    IconButton(onClick = { showTemplatePicker = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Dodaj trening",
-                            tint = UiTokens.Accent
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+                }
             )
 
             if (!isLoaded) {
@@ -96,7 +83,7 @@ fun LogContent(
                 ) {
                     Text(
                         text = "Učitavanje...",
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else if (workouts.isEmpty()) {
@@ -110,19 +97,19 @@ fun LogContent(
                         Icon(
                             Icons.Default.FitnessCenter,
                             contentDescription = null,
-                            tint = UiTokens.TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "Nema treninga",
                             style = MaterialTheme.typography.titleLarge,
-                            color = UiTokens.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "Pritisni + da dodaš prvi trening",
-                            color = UiTokens.TextMuted,
+                            text = "Pritisni „Trening“ da dodaš prvi",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -151,6 +138,15 @@ fun LogContent(
                 }
             }
         }
+
+        ExtendedFloatingActionButton(
+            onClick = { showTemplatePicker = true },
+            icon = { Icon(Icons.Default.Add, contentDescription = null) },
+            text = { Text("Trening") },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        )
     }
 
     // „+“: izbor vrste treninga (Volume = dosadašnji šablon, HIT = sve po 1 seriju)
@@ -176,10 +172,7 @@ fun LogContent(
                 TextButton(onClick = { showTemplatePicker = false }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 
@@ -200,17 +193,14 @@ fun LogContent(
                         workoutToDelete = null
                     }
                 ) {
-                    Text("Obriši", color = UiTokens.Danger)
+                    Text("Obriši", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { workoutToDelete = null }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 }
@@ -220,8 +210,8 @@ private fun TemplateOption(template: WorkoutTemplate, onClick: () -> Unit) {
     Surface(
         onClick = onClick,
         shape = MaterialTheme.shapes.medium,
-        color = UiTokens.SurfaceElevated,
-        border = BorderStroke(1.dp, UiTokens.GlassBorder),
+        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         modifier = Modifier
             .fillMaxWidth()
             .heightIn(min = 56.dp)
@@ -230,12 +220,12 @@ private fun TemplateOption(template: WorkoutTemplate, onClick: () -> Unit) {
             Text(
                 text = template.label,
                 style = MaterialTheme.typography.titleMedium,
-                color = UiTokens.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = template.description,
                 style = MaterialTheme.typography.bodySmall,
-                color = UiTokens.TextMuted
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
@@ -264,7 +254,7 @@ private fun SwipeableWorkoutCard(
         backgroundContent = {
             val color by animateColorAsState(
                 when (dismissState.targetValue) {
-                    SwipeToDismissBoxValue.EndToStart -> UiTokens.Danger.copy(alpha = 0.3f)
+                    SwipeToDismissBoxValue.EndToStart -> MaterialTheme.colorScheme.error.copy(alpha = 0.3f)
                     else -> Color.Transparent
                 },
                 label = "swipe_color"
@@ -273,7 +263,7 @@ private fun SwipeableWorkoutCard(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(color, shape = MaterialTheme.shapes.large)
+                    .background(color, shape = MaterialTheme.shapes.medium)
                     .padding(horizontal = 20.dp),
                 contentAlignment = Alignment.CenterEnd
             ) {
@@ -281,7 +271,7 @@ private fun SwipeableWorkoutCard(
                     Icon(
                         Icons.Default.Delete,
                         contentDescription = "Obriši",
-                        tint = UiTokens.Danger
+                        tint = MaterialTheme.colorScheme.error
                     )
                 }
             }

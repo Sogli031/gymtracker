@@ -1,7 +1,6 @@
 package com.gymtracker.app.ui.components
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.gymtracker.app.data.model.Workout
 import com.gymtracker.app.ui.theme.CardShape
-import com.gymtracker.app.ui.theme.UiTokens
 import com.gymtracker.app.ui.theme.categoryColor
 
 @Composable
@@ -34,10 +32,9 @@ fun WorkoutCard(
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable { onClick() },
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        onClick = onClick,
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Column(
@@ -52,14 +49,14 @@ fun WorkoutCard(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = workout.displayName,
-                        color = UiTokens.TextPrimary,
+                        color = MaterialTheme.colorScheme.onSurface,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
                     Spacer(modifier = Modifier.height(2.dp))
                     Text(
                         text = "${workout.displayDate} · ${workout.displayTime}",
-                        color = UiTokens.TextSecondary,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -83,7 +80,7 @@ fun WorkoutCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
                         text = workout.categorySummary,
-                        color = UiTokens.Accent,
+                        color = MaterialTheme.colorScheme.primary,
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
@@ -93,7 +90,7 @@ fun WorkoutCard(
 
             Text(
                 text = "${workout.totalExercises} vežbi · ${workout.totalSets} serija",
-                color = UiTokens.TextMuted,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
                 style = MaterialTheme.typography.labelMedium
             )
         }

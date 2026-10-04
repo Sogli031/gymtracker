@@ -29,14 +29,15 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import com.gymtracker.app.ui.theme.MaxContentWidth
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -62,8 +63,6 @@ import com.gymtracker.app.data.repository.WorkoutRepository
 import com.gymtracker.app.data.model.MachineSettings
 import com.gymtracker.app.ui.components.ExerciseCard
 import com.gymtracker.app.ui.components.MachineSettingsDialog
-import com.gymtracker.app.ui.theme.AppGradient
-import com.gymtracker.app.ui.theme.UiTokens
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -105,10 +104,10 @@ fun AddWorkoutScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AppGradient),
+                .background(MaterialTheme.colorScheme.background),
             contentAlignment = Alignment.Center
         ) {
-            CircularProgressIndicator(color = UiTokens.Accent)
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
         return
     }
@@ -337,18 +336,8 @@ fun AddWorkoutScreen(
         }
     }
 
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = UiTokens.Accent,
-        unfocusedBorderColor = UiTokens.GlassBorder,
-        focusedTextColor = UiTokens.TextPrimary,
-        unfocusedTextColor = UiTokens.TextPrimary,
-        cursorColor = UiTokens.Accent,
-        focusedContainerColor = UiTokens.SurfaceElevated,
-        unfocusedContainerColor = UiTokens.SurfaceElevated
-    )
 
     Scaffold(
-        containerColor = Color.Transparent,
         topBar = {
             TopAppBar(
                 title = {
@@ -357,7 +346,7 @@ fun AddWorkoutScreen(
                             isEditing -> "Izmeni trening"
                             else -> "Novi trening"
                         },
-                        color = UiTokens.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 },
                 navigationIcon = {
@@ -369,7 +358,7 @@ fun AddWorkoutScreen(
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = "Nazad",
-                            tint = UiTokens.TextPrimary
+                            tint = MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -380,7 +369,7 @@ fun AddWorkoutScreen(
                                 Icon(
                                     Icons.Default.MoreVert,
                                     contentDescription = "Više opcija",
-                                    tint = UiTokens.TextPrimary
+                                    tint = MaterialTheme.colorScheme.onSurface
                                 )
                             }
                             DropdownMenu(
@@ -399,7 +388,7 @@ fun AddWorkoutScreen(
                                     }
                                 )
                                 DropdownMenuItem(
-                                    text = { Text("Obriši", color = UiTokens.Danger) },
+                                    text = { Text("Obriši", color = MaterialTheme.colorScheme.error) },
                                     onClick = {
                                         showMenu = false
                                         showDeleteDialog = true
@@ -408,28 +397,28 @@ fun AddWorkoutScreen(
                                         Icon(
                                             Icons.Default.Delete,
                                             contentDescription = null,
-                                            tint = UiTokens.Danger
+                                            tint = MaterialTheme.colorScheme.error
                                         )
                                     }
                                 )
                             }
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+                }
             )
         }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(AppGradient)
-                .padding(paddingValues)
+                .background(MaterialTheme.colorScheme.background)
+                .padding(paddingValues),
+            contentAlignment = Alignment.TopCenter
         ) {
             LazyColumn(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = MaxContentWidth),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
@@ -437,11 +426,10 @@ fun AddWorkoutScreen(
                     OutlinedTextField(
                         value = nameText,
                         onValueChange = { nameText = it },
-                        label = { Text("Naziv treninga (opciono)", color = UiTokens.TextMuted) },
-                        placeholder = { Text("npr. Push Day, Legs...", color = UiTokens.TextMuted) },
+                        label = { Text("Naziv treninga (opciono)", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                        placeholder = { Text("npr. Push Day, Legs...", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        colors = textFieldColors
+                        singleLine = true
                     )
                 }
 
@@ -463,19 +451,17 @@ fun AddWorkoutScreen(
                                         if (it.isNotBlank()) "Neispravan format datuma (dd.MM.yyyy)" else null
                                     }
                                 },
-                                label = { Text("Datum", color = UiTokens.TextMuted) },
+                                label = { Text("Datum", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                                 modifier = Modifier.weight(1f),
                                 singleLine = true,
-                                isError = dateError != null,
-                                colors = textFieldColors
+                                isError = dateError != null
                             )
                             OutlinedTextField(
                                 value = timeText,
                                 onValueChange = { timeText = it },
-                                label = { Text("Vreme", color = UiTokens.TextMuted) },
+                                label = { Text("Vreme", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                                 modifier = Modifier.weight(1f),
-                                singleLine = true,
-                                colors = textFieldColors
+                                singleLine = true
                             )
                         }
                         dateError?.let { error ->
@@ -577,12 +563,12 @@ fun AddWorkoutScreen(
                         Icon(
                             Icons.Default.Add,
                             contentDescription = null,
-                            tint = UiTokens.AccentAlt
+                            tint = MaterialTheme.colorScheme.secondary
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             "Dodaj vežbu",
-                            color = UiTokens.AccentAlt,
+                            color = MaterialTheme.colorScheme.secondary,
                             style = MaterialTheme.typography.titleMedium
                         )
                     }
@@ -602,8 +588,7 @@ fun AddWorkoutScreen(
                 showExercisePicker = false
                 exerciseToReplace = null
             },
-            sheetState = sheetState,
-            containerColor = UiTokens.BgTop
+            sheetState = sheetState
         ) {
             ExercisePickerContent(
                 customExercises = customExercises,
@@ -654,17 +639,14 @@ fun AddWorkoutScreen(
                         navController.popBackStack()
                     }
                 ) {
-                    Text("Obriši", color = UiTokens.Danger)
+                    Text("Obriši", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteDialog = false }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 
@@ -683,17 +665,14 @@ fun AddWorkoutScreen(
                         exerciseToDelete = null
                     }
                 ) {
-                    Text("Obriši", color = UiTokens.Danger)
+                    Text("Obriši", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { exerciseToDelete = null }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 

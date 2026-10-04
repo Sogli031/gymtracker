@@ -1,7 +1,6 @@
 package com.gymtracker.app.ui.screens
 
 import android.app.Activity
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.material.icons.filled.FileDownload
@@ -45,9 +44,11 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
@@ -109,6 +110,7 @@ fun SettingsContent(
     var pendingImportJson by remember { mutableStateOf<String?>(null) }
 
     val context = LocalContext.current
+    val snackbarHostState = remember { SnackbarHostState() }
 
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("application/json")
@@ -123,11 +125,11 @@ fun SettingsContent(
                             output.write(json.toByteArray(Charsets.UTF_8))
                         } ?: throw java.io.IOException("Fajl ne može da se otvori za upis")
                     }
-                    Toast.makeText(context, "Izvoz uspešan", Toast.LENGTH_SHORT).show()
+                    snackbarHostState.showSnackbar("Izvoz uspešan")
                 } catch (e: kotlinx.coroutines.CancellationException) {
                     throw e
                 } catch (e: Exception) {
-                    Toast.makeText(context, "Greška pri izvozu: ${e.message}", Toast.LENGTH_SHORT).show()
+                    snackbarHostState.showSnackbar("Greška pri izvozu: ${e.message}")
                 }
             }
         }
@@ -146,7 +148,7 @@ fun SettingsContent(
                     showImportConfirmDialog = true
                 }
             } catch (e: Exception) {
-                Toast.makeText(context, "Greška pri čitanju fajla: ${e.message}", Toast.LENGTH_SHORT).show()
+                scope.launch { snackbarHostState.showSnackbar("Greška pri čitanju fajla: ${e.message}") }
             }
         }
     }
@@ -174,19 +176,14 @@ fun SettingsContent(
                 .verticalScroll(rememberScrollState())
         ) {
             // Header
-            Text(
-                text = "Podešavanja",
-                style = MaterialTheme.typography.headlineLarge,
-                color = UiTokens.TextPrimary,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-            )
+            TopAppBar(title = { Text("Podešavanja") })
 
             // Google Backup Card
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
                 shape = CardShape
             ) {
                 Column(
@@ -205,7 +202,7 @@ fun SettingsContent(
                             contentDescription = null,
                             tint = when (signInState) {
                                 is SignInState.SignedIn -> UiTokens.Success
-                                is SignInState.SignedOut -> UiTokens.TextMuted
+                                is SignInState.SignedOut -> MaterialTheme.colorScheme.onSurfaceVariant
                             },
                             modifier = Modifier.size(28.dp)
                         )
@@ -215,7 +212,7 @@ fun SettingsContent(
                                 text = "Google Drive Backup",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = UiTokens.TextPrimary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = when (signInState) {
@@ -223,7 +220,7 @@ fun SettingsContent(
                                     is SignInState.SignedOut -> "Nije povezano"
                                 },
                                 style = MaterialTheme.typography.bodySmall,
-                                color = UiTokens.TextMuted
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                     }
@@ -240,13 +237,13 @@ fun SettingsContent(
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(16.dp),
                                     strokeWidth = 2.dp,
-                                    color = UiTokens.Accent
+                                    color = MaterialTheme.colorScheme.primary
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Sinhronizacija...",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = UiTokens.TextMuted
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -277,14 +274,14 @@ fun SettingsContent(
                                 Icon(
                                     Icons.Default.Error,
                                     contentDescription = null,
-                                    tint = UiTokens.Danger,
+                                    tint = MaterialTheme.colorScheme.error,
                                     modifier = Modifier.size(16.dp)
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Greška: ${(syncState as SyncState.Error).message}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = UiTokens.Danger
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         }
@@ -299,11 +296,7 @@ fun SettingsContent(
                                 onClick = {
                                     signInLauncher.launch(backup.getSignInIntent())
                                 },
-                                modifier = Modifier.fillMaxWidth(),
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = UiTokens.Accent,
-                                    contentColor = UiTokens.TextPrimary
-                                )
+                                modifier = Modifier.fillMaxWidth()
                             ) {
                                 Icon(
                                     Icons.Default.Person,
@@ -350,7 +343,7 @@ fun SettingsContent(
                                 modifier = Modifier.fillMaxWidth(),
                                 enabled = syncState !is SyncState.Syncing
                             ) {
-                                Text("Vrati stariju kopiju", color = UiTokens.TextMuted)
+                                Text("Vrati stariju kopiju", color = MaterialTheme.colorScheme.onSurfaceVariant)
                             }
                             TextButton(
                                 onClick = { showSignOutConfirmDialog = true },
@@ -358,7 +351,7 @@ fun SettingsContent(
                             ) {
                                 Text(
                                     "Odjavi se",
-                                    color = UiTokens.Danger
+                                    color = MaterialTheme.colorScheme.error
                                 )
                             }
                         }
@@ -373,7 +366,7 @@ fun SettingsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
                 shape = CardShape
             ) {
                 Column(
@@ -385,7 +378,7 @@ fun SettingsContent(
                         text = "O backup-u",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Bold,
-                        color = UiTokens.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -395,7 +388,7 @@ fun SettingsContent(
                                "• Pre svakog prepisivanja čuva se prethodna kopija (poslednjih 5)\n" +
                                "• Ne troši tvoj Google Drive storage",
                         style = MaterialTheme.typography.bodySmall,
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
@@ -407,7 +400,7 @@ fun SettingsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
                 shape = CardShape
             ) {
                 Column(
@@ -419,13 +412,13 @@ fun SettingsContent(
                         text = "Izvoz i uvoz podataka",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = UiTokens.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Sačuvaj ili učitaj sve podatke iz JSON fajla",
                         style = MaterialTheme.typography.bodySmall,
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     OutlinedButton(
@@ -467,7 +460,7 @@ fun SettingsContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
                 shape = CardShape
             ) {
                 Column(
@@ -481,7 +474,7 @@ fun SettingsContent(
                         Icon(
                             imageVector = Icons.Default.FitnessCenter,
                             contentDescription = null,
-                            tint = UiTokens.Accent,
+                            tint = MaterialTheme.colorScheme.primary,
                             modifier = Modifier.size(28.dp)
                         )
                         Spacer(modifier = Modifier.width(12.dp))
@@ -490,20 +483,20 @@ fun SettingsContent(
                                 text = "Moje vežbe",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = UiTokens.TextPrimary
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                             Text(
                                 text = if (customExercises.isEmpty()) "Dodaj svoje vežbe"
                                        else "${customExercises.size} ${pluralize(customExercises.size, "vežba", "vežbe", "vežbi")}",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = UiTokens.TextMuted
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
                         IconButton(onClick = { showAddExerciseDialog = true }) {
                             Icon(
                                 Icons.Default.Add,
                                 contentDescription = "Dodaj vežbu",
-                                tint = UiTokens.Accent
+                                tint = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -533,7 +526,7 @@ fun SettingsContent(
                                     Text(
                                         text = "${exercise.category.displayName} • ${if (exercise.isCompound) "Složena" else "Izolacija"}",
                                         style = MaterialTheme.typography.bodySmall,
-                                        color = UiTokens.TextMuted
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
                                 IconButton(
@@ -543,7 +536,7 @@ fun SettingsContent(
                                     Icon(
                                         Icons.Default.Delete,
                                         contentDescription = "Obriši",
-                                        tint = UiTokens.Danger,
+                                        tint = MaterialTheme.colorScheme.error,
                                         modifier = Modifier.size(18.dp)
                                     )
                                 }
@@ -555,6 +548,10 @@ fun SettingsContent(
 
             Spacer(modifier = Modifier.height(80.dp))
         }
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter)
+        )
     }
 
     // Add Exercise Dialog
@@ -587,17 +584,14 @@ fun SettingsContent(
                         exerciseToDelete = null
                     }
                 ) {
-                    Text("Obriši", color = UiTokens.Danger)
+                    Text("Obriši", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { exerciseToDelete = null }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 
@@ -610,7 +604,7 @@ fun SettingsContent(
                 Column {
                     Text(
                         text = "Ovo će zameniti trenutne lokalne podatke podacima iz oblaka.",
-                        color = UiTokens.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
@@ -628,17 +622,14 @@ fun SettingsContent(
                         coordinator.restore()
                     }
                 ) {
-                    Text("Vrati", color = UiTokens.Accent)
+                    Text("Vrati", color = MaterialTheme.colorScheme.primary)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showRestoreConfirmDialog = false }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 
@@ -653,7 +644,7 @@ fun SettingsContent(
             text = {
                 Text(
                     text = "Ovo će zameniti postojeće podatke sadržajem fajla. Nastaviti?",
-                    color = UiTokens.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             confirmButton = {
@@ -666,7 +657,7 @@ fun SettingsContent(
                         coordinator.importFromJson(json)
                     }
                 ) {
-                    Text("Uvezi", color = UiTokens.Accent)
+                    Text("Uvezi", color = MaterialTheme.colorScheme.primary)
                 }
             },
             dismissButton = {
@@ -678,10 +669,7 @@ fun SettingsContent(
                 ) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 
@@ -693,7 +681,7 @@ fun SettingsContent(
             text = {
                 Text(
                     text = "Podaci ostaju sačuvani lokalno. Možeš se ponovo prijaviti bilo kada.",
-                    color = UiTokens.TextSecondary
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             confirmButton = {
@@ -705,17 +693,14 @@ fun SettingsContent(
                         }
                     }
                 ) {
-                    Text("Odjavi se", color = UiTokens.Danger)
+                    Text("Odjavi se", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showSignOutConfirmDialog = false }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 
@@ -732,15 +717,6 @@ private fun AddCustomExerciseDialog(
     var isCompound by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
 
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = UiTokens.Accent,
-        unfocusedBorderColor = UiTokens.GlassBorder,
-        focusedTextColor = UiTokens.TextPrimary,
-        unfocusedTextColor = UiTokens.TextPrimary,
-        cursorColor = UiTokens.Accent,
-        focusedContainerColor = UiTokens.SurfaceElevated,
-        unfocusedContainerColor = UiTokens.SurfaceElevated
-    )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -752,11 +728,10 @@ private fun AddCustomExerciseDialog(
                 OutlinedTextField(
                     value = name,
                     onValueChange = { name = it },
-                    label = { Text("Naziv vežbe", color = UiTokens.TextMuted) },
-                    placeholder = { Text("npr. Cable Fly", color = UiTokens.TextMuted) },
+                    label = { Text("Naziv vežbe", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                    placeholder = { Text("npr. Cable Fly", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 ExposedDropdownMenuBox(
@@ -767,12 +742,11 @@ private fun AddCustomExerciseDialog(
                         value = selectedCategory.displayName,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Kategorija", color = UiTokens.TextMuted) },
+                        label = { Text("Kategorija", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .menuAnchor(),
-                        colors = textFieldColors
+                            .menuAnchor()
                     )
                     ExposedDropdownMenu(
                         expanded = expanded,
@@ -810,12 +784,12 @@ private fun AddCustomExerciseDialog(
                         Text(
                             text = if (isCompound) "Složena vežba" else "Izolaciona vežba",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = UiTokens.TextPrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
                             text = if (isCompound) "Više mišićnih grupa" else "Jedna mišićna grupa",
                             style = MaterialTheme.typography.bodySmall,
-                            color = UiTokens.TextMuted
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
                     Switch(
@@ -836,16 +810,13 @@ private fun AddCustomExerciseDialog(
                 onClick = { onConfirm(name.trim(), selectedCategory, isCompound) },
                 enabled = name.isNotBlank()
             ) {
-                Text("Dodaj", color = if (name.isNotBlank()) UiTokens.Accent else UiTokens.TextMuted)
+                Text("Dodaj", color = if (name.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text("Odustani")
             }
-        },
-        containerColor = UiTokens.Surface,
-        titleContentColor = UiTokens.TextPrimary,
-        textContentColor = UiTokens.TextSecondary
+        }
     )
 }

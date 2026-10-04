@@ -1,5 +1,7 @@
 package com.gymtracker.app.ui.components
 
+import androidx.compose.material3.MaterialTheme
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
@@ -15,7 +17,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.gymtracker.app.data.backup.BackupCoordinator
 import com.gymtracker.app.data.backup.BackupPrompt
-import com.gymtracker.app.ui.theme.UiTokens
 import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -52,11 +53,8 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
                 PrimaryDialogButton("Vrati iz oblaka") { coordinator.restore() }
             },
             dismissButton = {
-                TextButton(onClick = { coordinator.dismissPrompt() }) { Text("Ne sada", color = UiTokens.TextMuted) }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+                TextButton(onClick = { coordinator.dismissPrompt() }) { Text("Ne sada", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
         )
 
         is BackupPrompt.CloudNotAdopted -> AlertDialog(
@@ -74,16 +72,13 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     PrimaryDialogButton("Vrati iz oblaka") { coordinator.restore() }
                     TextButton(onClick = { coordinator.backupAnyway() }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Ipak napravi backup", color = UiTokens.Danger)
+                        Text("Ipak napravi backup", color = MaterialTheme.colorScheme.error)
                     }
                     TextButton(onClick = { coordinator.dismissPrompt() }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Otkaži", color = UiTokens.TextMuted)
+                        Text("Otkaži", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
 
         BackupPrompt.EmptyLocalOverCloud -> AlertDialog(
@@ -99,16 +94,13 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     PrimaryDialogButton("Vrati iz oblaka") { coordinator.restore() }
                     TextButton(onClick = { coordinator.backup(confirmed = true) }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Ipak napravi backup", color = UiTokens.Danger)
+                        Text("Ipak napravi backup", color = MaterialTheme.colorScheme.error)
                     }
                     TextButton(onClick = { coordinator.dismissPrompt() }, modifier = Modifier.fillMaxWidth()) {
-                        Text("Otkaži", color = UiTokens.TextMuted)
+                        Text("Otkaži", color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
 
         is BackupPrompt.EmptyBackupOverLocal -> AlertDialog(
@@ -122,15 +114,12 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
             },
             confirmButton = {
                 TextButton(onClick = { coordinator.confirmPendingRestore() }) {
-                    Text("Ipak vrati", color = UiTokens.Danger)
+                    Text("Ipak vrati", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { coordinator.dismissPrompt() }) { Text("Otkaži", color = UiTokens.TextMuted) }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+                TextButton(onClick = { coordinator.dismissPrompt() }) { Text("Otkaži", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
         )
     }
 
@@ -145,7 +134,7 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
                         TextButton(onClick = { coordinator.restore(copy) }, modifier = Modifier.fillMaxWidth()) {
                             Text(
                                 formatCopyTime(copy.createdAtMillis) + if (copy.isCurrent) " (trenutna)" else "",
-                                color = UiTokens.Accent
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
@@ -153,11 +142,8 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
             },
             confirmButton = {},
             dismissButton = {
-                TextButton(onClick = { coordinator.dismissCopies() }) { Text("Otkaži", color = UiTokens.TextMuted) }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+                TextButton(onClick = { coordinator.dismissCopies() }) { Text("Otkaži", color = MaterialTheme.colorScheme.onSurfaceVariant) }
+            }
         )
     }
 
@@ -168,12 +154,9 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
             text = { Text(current.text) },
             confirmButton = {
                 TextButton(onClick = { coordinator.dismissMessage() }) {
-                    Text("U redu", color = if (current.success) UiTokens.Accent else UiTokens.Danger)
+                    Text("U redu", color = if (current.success) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error)
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 }
@@ -182,11 +165,7 @@ fun BackupDialogs(coordinator: BackupCoordinator) {
 private fun PrimaryDialogButton(label: String, onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = UiTokens.Accent,
-            contentColor = UiTokens.TextPrimary
-        )
+        modifier = Modifier.fillMaxWidth()
     ) {
         Text(label)
     }

@@ -61,7 +61,7 @@ fun ExercisePickerContent(
         Text(
             text = "Izaberi vežbu",
             style = MaterialTheme.typography.headlineSmall,
-            color = UiTokens.TextPrimary,
+            color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
         )
 
@@ -104,7 +104,7 @@ private fun CategoryPickerSection(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Column {
@@ -125,19 +125,19 @@ private fun CategoryPickerSection(
                     text = category.displayName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = UiTokens.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
                 Text(
                     text = "${exercises.size}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = UiTokens.TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,
                     contentDescription = if (isExpanded) "Skupi" else "Proširi",
-                    tint = UiTokens.TextMuted
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -149,7 +149,7 @@ private fun CategoryPickerSection(
                 Column {
                     exercises.forEach { exercise ->
                         val isCustom = exercise.name in customExerciseNames
-                        val exerciseColor = if (isCustom) UiTokens.Accent
+                        val exerciseColor = if (isCustom) MaterialTheme.colorScheme.primary
                             else if (exercise.isCompound) UiTokens.Compound
                             else UiTokens.Isolation
                         Row(
@@ -176,7 +176,7 @@ private fun CategoryPickerSection(
                                 Text(
                                     text = "(moja)",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = UiTokens.TextMuted
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }

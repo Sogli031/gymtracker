@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Compose crta ceo UI (GymTrackerTheme); ovde samo pozadina prozora
+         = M3 surface (#0E1116) da nema belog bleska pri pokretanju. -->
     <style name="Theme.GymTracker" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/gym_surface</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
         <item name="android:windowLightStatusBar">false</item>
     </style>
+
+    <color name="gym_surface">#0E1116</color>
 </resources>

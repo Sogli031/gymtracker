@@ -1,5 +1,7 @@
 package com.gymtracker.app.ui.components
 
+import androidx.compose.material3.MaterialTheme
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +14,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.gymtracker.app.data.model.ExerciseSet
-import com.gymtracker.app.ui.theme.UiTokens
 
 @Composable
 fun SetRow(
@@ -43,15 +43,6 @@ fun SetRow(
         mutableStateOf(set.reps?.toString() ?: "")
     }
 
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = UiTokens.Accent,
-        unfocusedBorderColor = UiTokens.GlassBorder,
-        focusedTextColor = UiTokens.TextPrimary,
-        unfocusedTextColor = UiTokens.TextPrimary,
-        cursorColor = UiTokens.Accent,
-        focusedContainerColor = UiTokens.SurfaceElevated,
-        unfocusedContainerColor = UiTokens.SurfaceElevated
-    )
 
     Row(
         modifier = modifier
@@ -61,7 +52,7 @@ fun SetRow(
     ) {
         Text(
             text = "$setNumber.",
-            color = UiTokens.TextSecondary,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
             modifier = Modifier.width(32.dp)
         )
 
@@ -76,13 +67,12 @@ fun SetRow(
             placeholder = {
                 Text(
                     text = placeholderKg?.toString() ?: "kg",
-                    color = UiTokens.TextMuted.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             modifier = Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-            singleLine = true,
-            colors = textFieldColors
+            singleLine = true
         )
 
         Spacer(modifier = Modifier.width(8.dp))
@@ -97,24 +87,22 @@ fun SetRow(
             placeholder = {
                 Text(
                     text = placeholderReps?.toString() ?: "reps",
-                    color = UiTokens.TextMuted.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             },
             modifier = Modifier.weight(1f),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            colors = textFieldColors
+            singleLine = true
         )
 
         if (onRemove != null) {
             IconButton(
-                onClick = onRemove,
-                modifier = Modifier.size(40.dp)
+                onClick = onRemove
             ) {
                 Icon(
                     Icons.Default.Close,
                     contentDescription = "Obriši set",
-                    tint = UiTokens.TextMuted,
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(18.dp)
                 )
             }

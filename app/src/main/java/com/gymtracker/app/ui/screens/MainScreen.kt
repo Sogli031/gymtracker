@@ -5,6 +5,21 @@ import android.app.Application
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.safeDrawing
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.platform.LocalConfiguration
+import com.gymtracker.app.ui.theme.MaxContentWidth
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,12 +40,10 @@ import androidx.compose.material.icons.outlined.MonitorWeight
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -42,13 +55,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.gymtracker.app.data.backup.BackupProvider
@@ -59,8 +70,6 @@ import com.gymtracker.app.data.repository.CycleRepository
 import com.gymtracker.app.data.repository.MachineSettingsRepository
 import com.gymtracker.app.data.repository.WorkoutRepository
 import com.gymtracker.app.ui.components.BackupDialogs
-import com.gymtracker.app.ui.theme.AppGradient
-import com.gymtracker.app.ui.theme.UiTokens
 data class BottomNavItem(
     val label: String,
     val selectedIcon: ImageVector,
@@ -125,74 +134,108 @@ fun MainScreen(
         BottomNavItem("Opcije", Icons.Filled.Settings, Icons.Outlined.Settings)
     )
 
-    Scaffold(
-        containerColor = Color.Transparent,
-        bottomBar = {
-            NavigationBar(
-                containerColor = UiTokens.Surface,
-                contentColor = UiTokens.TextPrimary
+    // M3: navigation bar na uskim ekranima, navigation rail od 600dp (tablet, landscape).
+    val useRail = LocalConfiguration.current.screenWidthDp >= 600
+
+    val tabContent: @Composable (Modifier) -> Unit = { contentModifier ->
+        Box(
+            modifier = contentModifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.background),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Crossfade(
+                targetState = selectedTab,
+                animationSpec = tween(durationMillis = 300),
+                label = "tab",
+                modifier = Modifier
+                    .fillMaxHeight()
+                    .widthIn(max = MaxContentWidth)
+            ) { tab ->
+                when (tab) {
+                    0 -> LogContent(
+                        navController = navController,
+                        repository = workoutRepository
+                    )
+                    1 -> StatisticsContent(
+                        repository = workoutRepository
+                    )
+                    2 -> BodyContent(
+                        bodyMetricsRepository = bodyMetricsRepository
+                    )
+                    3 -> SettingsContent(
+                        backup = backup,
+                        coordinator = coordinator,
+                        repository = workoutRepository,
+                        customExerciseRepository = customExerciseRepository,
+                        bodyMetricsRepository = bodyMetricsRepository,
+                        cycleRepository = cycleRepository,
+                        machineSettingsRepository = machineSettingsRepository
+                    )
+                }
+            }
+        }
+    }
+
+    if (useRail) {
+        Row(modifier = Modifier.fillMaxSize()) {
+            NavigationRail(
+                modifier = Modifier.fillMaxHeight(),
+                windowInsets = WindowInsets.safeDrawing.only(
+                    WindowInsetsSides.Vertical + WindowInsetsSides.Start
+                )
             ) {
+                Spacer(modifier = Modifier.weight(1f))
                 navItems.forEachIndexed { index, item ->
-                    NavigationBarItem(
+                    NavigationRailItem(
                         selected = selectedTab == index,
                         onClick = { selectedTab = index },
                         icon = {
                             Icon(
                                 imageVector = if (selectedTab == index) item.selectedIcon else item.unselectedIcon,
-                                contentDescription = item.label
+                                contentDescription = null
                             )
                         },
-                        label = {
-                            Text(
-                                text = item.label,
-                                fontSize = 10.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                        },
-                        colors = NavigationBarItemDefaults.colors(
-                            selectedIconColor = UiTokens.Accent,
-                            selectedTextColor = UiTokens.Accent,
-                            unselectedIconColor = UiTokens.TextMuted,
-                            unselectedTextColor = UiTokens.TextMuted,
-                            indicatorColor = UiTokens.Accent.copy(alpha = 0.15f)
-                        )
+                        label = { Text(item.label, maxLines = 1) }
                     )
                 }
+                Spacer(modifier = Modifier.weight(1f))
             }
+            tabContent(
+                Modifier
+                    .weight(1f)
+                    .windowInsetsPadding(
+                        WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.End)
+                    )
+            )
         }
-    ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(AppGradient)
-        ) {
-            // Content based on selected tab
-            when (selectedTab) {
-                0 -> LogContent(
-                    navController = navController,
-                    repository = workoutRepository,
-                    modifier = Modifier.padding(paddingValues)
-                )
-                1 -> StatisticsContent(
-                    repository = workoutRepository,
-                    modifier = Modifier.padding(paddingValues)
-                )
-                2 -> BodyContent(
-                    bodyMetricsRepository = bodyMetricsRepository,
-                    modifier = Modifier.padding(paddingValues)
-                )
-                3 -> SettingsContent(
-                    backup = backup,
-                    coordinator = coordinator,
-                    repository = workoutRepository,
-                    customExerciseRepository = customExerciseRepository,
-                    bodyMetricsRepository = bodyMetricsRepository,
-                    cycleRepository = cycleRepository,
-                    machineSettingsRepository = machineSettingsRepository,
-                    modifier = Modifier.padding(paddingValues)
-                )
+    } else {
+        Scaffold(
+            bottomBar = {
+                NavigationBar {
+                    navItems.forEachIndexed { index, item ->
+                        NavigationBarItem(
+                            selected = selectedTab == index,
+                            onClick = { selectedTab = index },
+                            icon = {
+                                Icon(
+                                    imageVector = if (selectedTab == index) item.selectedIcon else item.unselectedIcon,
+                                    contentDescription = null
+                                )
+                            },
+                            label = {
+                                Text(
+                                    text = item.label,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        )
+                    }
+                }
             }
+        ) { paddingValues ->
+            tabContent(Modifier.padding(paddingValues))
         }
     }
 }
@@ -204,19 +247,18 @@ private fun WelcomeDialog(
 ) {
     AlertDialog(
         onDismissRequest = onSkip,
-        containerColor = UiTokens.Surface,
         icon = {
             Icon(
                 imageVector = Icons.Default.Cloud,
                 contentDescription = null,
-                tint = UiTokens.Accent,
+                tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.size(48.dp)
             )
         },
         title = {
             Text(
                 text = "Dobrodošli!",
-                color = UiTokens.TextPrimary,
+                color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -225,14 +267,14 @@ private fun WelcomeDialog(
             Column {
                 Text(
                     text = "Povežite Google nalog da biste automatski čuvali svoje treninge u cloud-u.",
-                    color = UiTokens.TextSecondary,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Možete ovo uraditi i kasnije u podešavanjima.",
-                    color = UiTokens.TextMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center
                 )
@@ -240,11 +282,7 @@ private fun WelcomeDialog(
         },
         confirmButton = {
             Button(
-                onClick = onSignIn,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = UiTokens.Accent,
-                    contentColor = UiTokens.TextPrimary
-                )
+                onClick = onSignIn
             ) {
                 Text("Poveži Google")
             }
@@ -253,7 +291,7 @@ private fun WelcomeDialog(
             TextButton(onClick = onSkip) {
                 Text(
                     text = "Preskoči",
-                    color = UiTokens.TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

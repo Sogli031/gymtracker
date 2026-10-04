@@ -38,11 +38,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -83,9 +81,7 @@ fun BodyContent(
             TopAppBar(
                 title = {
                     Text(
-                        "Telo",
-                        color = UiTokens.TextPrimary,
-                        fontWeight = FontWeight.Bold
+                        "Telo"
                     )
                 },
                 actions = {
@@ -93,13 +89,10 @@ fun BodyContent(
                         Icon(
                             Icons.Default.Edit,
                             contentDescription = "Izmeni profil",
-                            tint = UiTokens.TextMuted
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color.Transparent
-                )
+                }
             )
 
             LazyColumn(
@@ -140,7 +133,7 @@ fun BodyContent(
                         Text(
                             text = "ISTORIJA TEŽINE",
                             style = MaterialTheme.typography.labelMedium,
-                            color = UiTokens.TextMuted,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             letterSpacing = 2.sp,
                             modifier = Modifier.padding(start = 4.dp, top = 8.dp)
                         )
@@ -163,16 +156,13 @@ fun BodyContent(
         // FAB to add weight
         FloatingActionButton(
             onClick = { showAddWeightDialog = true },
-            containerColor = UiTokens.Accent,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp)
-                .padding(bottom = 64.dp)
         ) {
             Icon(
                 Icons.Default.Add,
-                contentDescription = "Dodaj težinu",
-                tint = UiTokens.TextPrimary
+                contentDescription = "Dodaj težinu"
             )
         }
     }
@@ -217,17 +207,14 @@ fun BodyContent(
                     bodyMetricsRepository.deleteWeightEntry(entry.id)
                     entryToDelete = null
                 }) {
-                    Text("Obriši", color = UiTokens.Danger)
+                    Text("Obriši", color = MaterialTheme.colorScheme.error)
                 }
             },
             dismissButton = {
                 TextButton(onClick = { entryToDelete = null }) {
                     Text("Odustani")
                 }
-            },
-            containerColor = UiTokens.Surface,
-            titleContentColor = UiTokens.TextPrimary,
-            textContentColor = UiTokens.TextSecondary
+            }
         )
     }
 }
@@ -241,7 +228,7 @@ private fun CurrentWeightCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Column(
@@ -254,13 +241,13 @@ private fun CurrentWeightCard(
                 modifier = Modifier
                     .size(64.dp)
                     .clip(CircleShape)
-                    .background(UiTokens.Accent.copy(alpha = 0.2f)),
+                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     Icons.Default.MonitorWeight,
                     contentDescription = null,
-                    tint = UiTokens.Accent,
+                    tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.size(32.dp)
                 )
             }
@@ -272,7 +259,7 @@ private fun CurrentWeightCard(
                     text = "%.1f kg".format(currentWeight),
                     style = MaterialTheme.typography.displayMedium,
                     fontWeight = FontWeight.Bold,
-                    color = UiTokens.TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
 
                 if (totalChange != null) {
@@ -283,14 +270,14 @@ private fun CurrentWeightCard(
                         Icon(
                             imageVector = if (totalChange >= 0) Icons.Default.TrendingUp else Icons.Default.TrendingDown,
                             contentDescription = null,
-                            tint = if (totalChange >= 0) UiTokens.Success else UiTokens.Danger,
+                            tint = if (totalChange >= 0) UiTokens.Success else MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(20.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "%+.1f kg ukupno".format(totalChange),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = if (totalChange >= 0) UiTokens.Success else UiTokens.Danger
+                            color = if (totalChange >= 0) UiTokens.Success else MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -299,7 +286,7 @@ private fun CurrentWeightCard(
                     Text(
                         text = "Cilj: %.1f kg".format(goalWeight),
                         style = MaterialTheme.typography.bodySmall,
-                        color = UiTokens.TextMuted,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
@@ -307,12 +294,12 @@ private fun CurrentWeightCard(
                 Text(
                     text = "Dodaj svoju težinu",
                     style = MaterialTheme.typography.titleMedium,
-                    color = UiTokens.TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = "Klikni + dugme ispod",
                     style = MaterialTheme.typography.bodySmall,
-                    color = UiTokens.TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -328,7 +315,7 @@ private fun CalorieInfoCard(
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Column(
@@ -348,7 +335,7 @@ private fun CalorieInfoCard(
                     text = "Kalorije",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = UiTokens.TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
@@ -362,7 +349,7 @@ private fun CalorieInfoCard(
                     CalorieStatItem(
                         label = "Održavanje",
                         value = "$tdee kcal",
-                        color = UiTokens.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     CalorieStatItem(
                         label = "Za rast",
@@ -380,12 +367,12 @@ private fun CalorieInfoCard(
                     CalorieStatItem(
                         label = "BMR",
                         value = "${bmr ?: 0} kcal",
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     CalorieStatItem(
                         label = "Protein cilj",
                         value = "${proteinTarget ?: 0}g",
-                        color = UiTokens.AccentAlt
+                        color = MaterialTheme.colorScheme.secondary
                     )
                 }
 
@@ -400,7 +387,7 @@ private fun CalorieInfoCard(
                 Text(
                     text = "Dodaj težinu i popuni profil da vidiš kalorijske potrebe",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = UiTokens.TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
@@ -423,7 +410,7 @@ private fun CalorieStatItem(
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = UiTokens.TextMuted
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -434,7 +421,7 @@ private fun MacroBreakdownCard(targetCalories: Int) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Column(
@@ -446,7 +433,7 @@ private fun MacroBreakdownCard(targetCalories: Int) {
                 text = "Makro raspored (60/25/15)",
                 style = MaterialTheme.typography.titleSmall,
                 fontWeight = FontWeight.Bold,
-                color = UiTokens.TextPrimary
+                color = MaterialTheme.colorScheme.onSurface
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -463,12 +450,12 @@ private fun MacroBreakdownCard(targetCalories: Int) {
                 MacroItem(
                     name = "Proteini",
                     grams = protein,
-                    color = UiTokens.Danger
+                    color = MaterialTheme.colorScheme.error
                 )
                 MacroItem(
                     name = "Masti",
                     grams = fat,
-                    color = UiTokens.AccentAlt
+                    color = MaterialTheme.colorScheme.secondary
                 )
             }
         }
@@ -500,7 +487,7 @@ private fun MacroItem(
         Text(
             text = name,
             style = MaterialTheme.typography.bodySmall,
-            color = UiTokens.TextMuted
+            color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }
 }
@@ -514,7 +501,7 @@ private fun WeightEntryCard(
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Row(
@@ -529,12 +516,12 @@ private fun WeightEntryCard(
                     text = "%.1f kg".format(entry.weightKg),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium,
-                    color = UiTokens.TextPrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = displayDate,
                     style = MaterialTheme.typography.bodySmall,
-                    color = UiTokens.TextMuted
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
@@ -542,7 +529,7 @@ private fun WeightEntryCard(
                 Icon(
                     Icons.Default.Delete,
                     contentDescription = "Obriši",
-                    tint = UiTokens.Danger,
+                    tint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -558,15 +545,6 @@ private fun AddWeightDialog(
 ) {
     var weightText by remember { mutableStateOf("") }
 
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = UiTokens.Accent,
-        unfocusedBorderColor = UiTokens.GlassBorder,
-        focusedTextColor = UiTokens.TextPrimary,
-        unfocusedTextColor = UiTokens.TextPrimary,
-        cursorColor = UiTokens.Accent,
-        focusedContainerColor = UiTokens.SurfaceElevated,
-        unfocusedContainerColor = UiTokens.SurfaceElevated
-    )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -575,12 +553,11 @@ private fun AddWeightDialog(
             OutlinedTextField(
                 value = weightText,
                 onValueChange = { weightText = it.filter { c -> c.isDigit() || c == '.' } },
-                label = { Text("Težina (kg)", color = UiTokens.TextMuted) },
-                placeholder = { Text("npr. 75.5", color = UiTokens.TextMuted) },
+                label = { Text("Težina (kg)", color = MaterialTheme.colorScheme.onSurfaceVariant) },
+                placeholder = { Text("npr. 75.5", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                 singleLine = true,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.fillMaxWidth(),
-                colors = textFieldColors
+                modifier = Modifier.fillMaxWidth()
             )
         },
         confirmButton = {
@@ -590,17 +567,14 @@ private fun AddWeightDialog(
                 },
                 enabled = weightText.toFloatOrNull() != null
             ) {
-                Text("Dodaj", color = if (weightText.toFloatOrNull() != null) UiTokens.Accent else UiTokens.TextMuted)
+                Text("Dodaj", color = if (weightText.toFloatOrNull() != null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text("Odustani")
             }
-        },
-        containerColor = UiTokens.Surface,
-        titleContentColor = UiTokens.TextPrimary,
-        textContentColor = UiTokens.TextSecondary
+        }
     )
 }
 
@@ -620,15 +594,6 @@ private fun EditProfileDialog(
     var genderExpanded by remember { mutableStateOf(false) }
     var activityExpanded by remember { mutableStateOf(false) }
 
-    val textFieldColors = OutlinedTextFieldDefaults.colors(
-        focusedBorderColor = UiTokens.Accent,
-        unfocusedBorderColor = UiTokens.GlassBorder,
-        focusedTextColor = UiTokens.TextPrimary,
-        unfocusedTextColor = UiTokens.TextPrimary,
-        cursorColor = UiTokens.Accent,
-        focusedContainerColor = UiTokens.SurfaceElevated,
-        unfocusedContainerColor = UiTokens.SurfaceElevated
-    )
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -638,21 +603,19 @@ private fun EditProfileDialog(
                 OutlinedTextField(
                     value = heightText,
                     onValueChange = { heightText = it.filter { c -> c.isDigit() } },
-                    label = { Text("Visina (cm)", color = UiTokens.TextMuted) },
+                    label = { Text("Visina (cm)", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 OutlinedTextField(
                     value = birthYearText,
                     onValueChange = { birthYearText = it.filter { c -> c.isDigit() } },
-                    label = { Text("Godina rođenja", color = UiTokens.TextMuted) },
+                    label = { Text("Godina rođenja", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    modifier = Modifier.fillMaxWidth()
                 )
 
                 // Gender dropdown
@@ -664,10 +627,9 @@ private fun EditProfileDialog(
                         value = gender.displayName,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Pol", color = UiTokens.TextMuted) },
+                        label = { Text("Pol", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = genderExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(),
-                        colors = textFieldColors
+                        modifier = Modifier.fillMaxWidth().menuAnchor()
                     )
                     ExposedDropdownMenu(
                         expanded = genderExpanded,
@@ -694,10 +656,9 @@ private fun EditProfileDialog(
                         value = activityLevel.displayName,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Nivo aktivnosti", color = UiTokens.TextMuted) },
+                        label = { Text("Nivo aktivnosti", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = activityExpanded) },
-                        modifier = Modifier.fillMaxWidth().menuAnchor(),
-                        colors = textFieldColors
+                        modifier = Modifier.fillMaxWidth().menuAnchor()
                     )
                     ExposedDropdownMenu(
                         expanded = activityExpanded,
@@ -718,11 +679,10 @@ private fun EditProfileDialog(
                 OutlinedTextField(
                     value = goalWeightText,
                     onValueChange = { goalWeightText = it.filter { c -> c.isDigit() || c == '.' } },
-                    label = { Text("Ciljna težina (kg) - opciono", color = UiTokens.TextMuted) },
+                    label = { Text("Ciljna težina (kg) - opciono", color = MaterialTheme.colorScheme.onSurfaceVariant) },
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = textFieldColors
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         },
@@ -735,16 +695,13 @@ private fun EditProfileDialog(
                     onConfirm(height, birthYear, gender, activityLevel, goalWeight)
                 }
             ) {
-                Text("Sačuvaj", color = UiTokens.Accent)
+                Text("Sačuvaj", color = MaterialTheme.colorScheme.primary)
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text("Odustani")
             }
-        },
-        containerColor = UiTokens.Surface,
-        titleContentColor = UiTokens.TextPrimary,
-        textContentColor = UiTokens.TextSecondary
+        }
     )
 }

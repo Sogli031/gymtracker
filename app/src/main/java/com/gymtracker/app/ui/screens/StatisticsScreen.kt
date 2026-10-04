@@ -22,6 +22,8 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -40,6 +42,7 @@ import com.gymtracker.app.util.pluralize
 import com.gymtracker.app.ui.theme.CardShape
 import com.gymtracker.app.ui.theme.UiTokens
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsContent(
     repository: WorkoutRepository,
@@ -58,12 +61,7 @@ fun StatisticsContent(
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
-            Text(
-                text = "Napredak po vežbama",
-                style = MaterialTheme.typography.headlineLarge,
-                color = UiTokens.TextPrimary,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-            )
+            TopAppBar(title = { Text("Napredak po vežbama") })
 
             if (!isLoaded) {
                 Box(
@@ -72,7 +70,7 @@ fun StatisticsContent(
                 ) {
                     Text(
                         text = "Učitavanje...",
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             } else if (exerciseProgress.isEmpty()) {
@@ -87,19 +85,19 @@ fun StatisticsContent(
                         Icon(
                             Icons.Default.BarChart,
                             contentDescription = null,
-                            tint = UiTokens.TextMuted,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.size(64.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "Nema podataka",
                             style = MaterialTheme.typography.titleLarge,
-                            color = UiTokens.TextSecondary
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "Napredak se vidi kad istu vežbu odradiš bar 2 puta",
-                            color = UiTokens.TextMuted,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.Center
                         )
                     }
@@ -128,7 +126,7 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
 
     Card(
         modifier = Modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(containerColor = UiTokens.Surface),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         shape = CardShape
     ) {
         Column(
@@ -145,14 +143,14 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                     text = progress.exerciseName,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
-                    color = UiTokens.TextPrimary,
+                    color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.weight(1f)
                 )
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
                         imageVector = if (hasImproved) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
                         contentDescription = null,
-                        tint = if (hasImproved) UiTokens.Success else UiTokens.Danger,
+                        tint = if (hasImproved) UiTokens.Success else MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(16.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -160,7 +158,7 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                         text = "${if (hasImproved) "+" else ""}${String.format("%.0f", progress.progressPercent)}%",
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold,
-                        color = if (hasImproved) UiTokens.Success else UiTokens.Danger
+                        color = if (hasImproved) UiTokens.Success else MaterialTheme.colorScheme.error
                     )
                 }
             }
@@ -175,7 +173,7 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                     Text(
                         text = "Početak",
                         style = MaterialTheme.typography.labelSmall,
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = buildString {
@@ -184,13 +182,13 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                             progress.firstReps?.let { append("${it}rep") }
                         },
                         style = MaterialTheme.typography.bodyMedium,
-                        color = UiTokens.TextSecondary
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     progress.first1RM?.let { rm ->
                         Text(
                             text = "${String.format("%.1f", rm)}kg 1RM",
                             style = MaterialTheme.typography.labelSmall,
-                            color = UiTokens.Accent.copy(alpha = 0.7f)
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.7f)
                         )
                     }
                 }
@@ -199,7 +197,7 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                     Text(
                         text = "→",
                         style = MaterialTheme.typography.titleMedium,
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     progress.oneRMChange?.let { change ->
                         val improved = change > 0
@@ -207,7 +205,7 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                             text = "${if (improved) "+" else ""}${String.format("%.1f", change)}kg",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = if (improved) UiTokens.Success else UiTokens.Danger
+                            color = if (improved) UiTokens.Success else MaterialTheme.colorScheme.error
                         )
                     }
                 }
@@ -216,7 +214,7 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                     Text(
                         text = "Sada",
                         style = MaterialTheme.typography.labelSmall,
-                        color = UiTokens.TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = buildString {
@@ -226,14 +224,14 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
                         },
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = UiTokens.TextPrimary
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                     progress.last1RM?.let { rm ->
                         Text(
                             text = "${String.format("%.1f", rm)}kg 1RM",
                             style = MaterialTheme.typography.labelSmall,
                             fontWeight = FontWeight.Bold,
-                            color = UiTokens.Accent
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
@@ -244,7 +242,7 @@ private fun ExerciseProgressCard(progress: ExerciseProgress) {
             Text(
                 text = "${progress.workoutCount} ${pluralize(progress.workoutCount, "trening", "treninga", "treninga")}",
                 style = MaterialTheme.typography.labelSmall,
-                color = UiTokens.TextMuted
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
